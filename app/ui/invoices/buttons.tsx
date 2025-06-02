@@ -1,5 +1,10 @@
+// /app/ui/invoices/buttons.tsx
+'use client';
+
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { useFormState, useFormStatus } from 'react-dom';
+import { deleteInvoice } from '@/app/lib/actions';
 
 export function CreateInvoice() {
   return (
@@ -16,7 +21,7 @@ export function CreateInvoice() {
 export function UpdateInvoice({ id }: { id: string }) {
   return (
     <Link
-      href="/dashboard/invoices"
+      href={`/dashboard/invoices/${id}/edit`}
       className="rounded-md border p-2 hover:bg-gray-100"
     >
       <PencilIcon className="w-5" />
@@ -25,12 +30,30 @@ export function UpdateInvoice({ id }: { id: string }) {
 }
 
 export function DeleteInvoice({ id }: { id: string }) {
+  const deleteInvoiceWithId = deleteInvoice.bind(null, id);
+  const [state, dispatch] = useFormState(deleteInvoiceWithId, { message: '' });
+  
   return (
-    <>
-      <button type="submit" className="rounded-md border p-2 hover:bg-gray-100">
-        <span className="sr-only">Delete</span>
-        <TrashIcon className="w-5" />
-      </button>
-    </>
+    <form action={dispatch}>
+      <DeleteButton />
+      {state?.message && (
+        <p className="mt-2 text-sm text-red-500">{state.message}</p>
+      )}
+    </form>
+  );
+}
+
+function DeleteButton() {
+  const { pending } = useFormStatus();
+  
+  return (
+    <button 
+      className="rounded-md border p-2 hover:bg-gray-100"
+      disabled={pending}
+      aria-disabled={pending}
+    >
+      <span className="sr-only">Delete</span>
+      <TrashIcon className="w-5" />
+    </button>
   );
 }
