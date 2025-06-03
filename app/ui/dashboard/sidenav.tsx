@@ -1,5 +1,5 @@
 // /app/ui/dashboard/sidenav.tsx
-'use client';
+
 
 import Link from 'next/link';
 import NavLinks from '@/app/ui/dashboard/nav-links';
