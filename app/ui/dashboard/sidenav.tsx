@@ -5,25 +5,29 @@ import Link from 'next/link';
 import NavLinks from '@/app/ui/dashboard/nav-links';
 import AcmeLogo from '@/app/ui/acme-logo';
 import { PowerIcon } from '@heroicons/react/24/outline';
-import { signOut } from '@/auth';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 
 export default function SideNav() {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSignOut = async () => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      startTransition(async () => {
-        await signOut({ redirect: false });
-        router.push('/');
-        router.refresh();
-      });
+      // Dynamically import auth to avoid server code in client component
+      const { signOut } = await import('@/auth');
+      await signOut({ redirect: false });
+      router.push('/');
+      router.refresh();
     } catch (err) {
       setError('Failed to sign out. Please try again.');
       console.error('Sign out error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,15 +47,15 @@ export default function SideNav() {
         <div className="relative">
           <button
             onClick={handleSignOut}
-            disabled={isPending}
+            disabled={isLoading}
             className={`flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3 ${
-              isPending ? 'opacity-50 cursor-not-allowed' : ''
+              isLoading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
-            aria-disabled={isPending}
+            aria-disabled={isLoading}
           >
             <PowerIcon className="w-6" />
             <div className="hidden md:block">
-              {isPending ? 'Signing out...' : 'Sign Out'}
+              {isLoading ? 'Signing out...' : 'Sign Out'}
             </div>
           </button>
           {error && (
