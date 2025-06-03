@@ -1,5 +1,4 @@
-// /app/ui/dashboard/sidenav.tsx
-
+'use client';
 
 import Link from 'next/link';
 import NavLinks from '@/app/ui/dashboard/nav-links';
@@ -16,16 +15,16 @@ export default function SideNav() {
   const handleSignOut = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      // Dynamically import auth to avoid server code in client component
+      // Dynamically import signOut to avoid bundling server code into the client
       const { signOut } = await import('@/auth');
       await signOut({ redirect: false });
       router.push('/');
       router.refresh();
     } catch (err) {
-      setError('Failed to sign out. Please try again.');
       console.error('Sign out error:', err);
+      setError('Failed to sign out. Please try again.');
     } finally {
       setIsLoading(false);
     }
