@@ -6,6 +6,8 @@ import AcmeLogo from '@/app/ui/acme-logo';
 import { PowerIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+// Import signOut from next-auth/react for client-side sign out
+import { signOut } from 'next-auth/react';
 
 export default function SideNav() {
   const router = useRouter();
@@ -17,8 +19,6 @@ export default function SideNav() {
     setError(null);
 
     try {
-      // Dynamically import signOut to avoid bundling server code into the client
-      const { signOut } = await import('@/auth');
       await signOut({ redirect: false });
       router.push('/');
       router.refresh();
